@@ -1,0 +1,38 @@
+name: Deploy to Azure Container Apps
+
+on:
+  push:
+    branches: [main]
+
+env:
+  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+  IMAGE_NAME: openwebui
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v3
+
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Log in to ACR
+      run: |
+        echo ${{ secrets.ACR_PASSWORD }} | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+
+    - name: Build and Push Docker image
+      run: |
+        docker build -t $ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }} .
+        docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}
+
+    - name: Deploy to Azure Container Apps
+      run: |
+        az containerapp update \
+          --name openwebui-app \
+          --resource-group OpenWebUI-RG \
+          --image $ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}
