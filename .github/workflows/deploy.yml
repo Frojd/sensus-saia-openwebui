@@ -21,11 +21,11 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Log in to ACR
+    - name: Log in to Azure Container Registry
       run: |
         echo ${{ secrets.ACR_PASSWORD }} | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
 
-    - name: Build and Push Docker image
+    - name: Build and push Docker image
       run: |
         docker build -t $ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }} .
         docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}
@@ -33,6 +33,6 @@ jobs:
     - name: Deploy to Azure Container Apps
       run: |
         az containerapp update \
-          --name openwebui-app \
-          --resource-group OpenWebUI-RG \
+          --name sensus-saia-dev-app \
+          --resource-group sensus-saia-dev-rg \
           --image $ACR_LOGIN_SERVER/$IMAGE_NAME:${{ github.sha }}
