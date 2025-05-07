@@ -17,6 +17,7 @@
 	import Connections from './Settings/Connections.svelte';
 	import Documents from './Settings/Documents.svelte';
 	import WebSearch from './Settings/WebSearch.svelte';
+	import ThemeSettings from './Settings/ThemeSettings.svelte';
 
 	import ChartBar from '../icons/ChartBar.svelte';
 	import DocumentChartBar from '../icons/DocumentChartBar.svelte';
@@ -431,6 +432,38 @@
 			</div>
 			<div class=" self-center">{$i18n.t('Database')}</div>
 		</button>
+
+		<button
+			class="px-0.5 py-1 min-w-fit rounded-lg flex-1 md:flex-none flex text-left transition {selectedTab ===
+			'theme'
+				? ''
+				: ' text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'}"
+			on:click={() => {
+				selectedTab = 'theme';
+			}}
+		>
+			<div class=" self-center mr-2">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 24 24"
+					fill="currentColor"
+					class="w-4 h-4"
+				>
+					<path
+						fill-rule="evenodd"
+						d="M2.25 4.125c0-1.036.84-1.875 1.875-1.875h5.25c1.036 0 1.875.84 1.875 1.875V17.25a4.5 4.5 0 1 1-9 0V4.125Zm4.5 14.25a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z"
+						clip-rule="evenodd"
+					/>
+					<path
+						d="M10.719 21.75h9.156c1.036 0 1.875-.84 1.875-1.875v-5.25c0-1.036-.84-1.875-1.875-1.875h-.14l-8.742 8.743c-.09.089-.18.175-.274.257h.001Z"
+					/>
+					<path
+						d="M10.125 17.25a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75Zm6.75-4.5a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75Zm-3-3a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75Zm-3-3a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75Z"
+					/>
+				</svg>
+			</div>
+			<div class=" self-center">{$i18n.t('Theme')}</div>
+		</button>
 	</div>
 
 	<div class="flex-1 mt-3 lg:mt-0 overflow-y-scroll pr-1 scrollbar-hidden">
@@ -510,6 +543,15 @@
 			<Pipelines
 				saveHandler={() => {
 					toast.success($i18n.t('Settings saved successfully!'));
+				}}
+			/>
+		{:else if selectedTab === 'theme'}
+			<ThemeSettings
+				saveHandler={async () => {
+					toast.success($i18n.t('Settings saved successfully!'));
+					
+					await tick();
+					await config.set(await getBackendConfig());
 				}}
 			/>
 		{/if}

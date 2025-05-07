@@ -210,7 +210,7 @@
 				{:else}
 					<div class="  my-auto pb-10 w-full dark:text-gray-100">
 						<form
-							class=" flex flex-col justify-center"
+							class="auth-form flex flex-col justify-center"
 							on:submit={(e) => {
 								e.preventDefault();
 								submitHandler();
