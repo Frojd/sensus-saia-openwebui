@@ -668,12 +668,22 @@
 {/if}
 
 <Toaster
-	theme={$theme.includes('dark')
-		? 'dark'
-		: $theme === 'system'
-			? window.matchMedia('(prefers-color-scheme: dark)').matches
+	theme={typeof $theme === 'string' 
+		? ($theme.includes('dark') 
+			? 'dark' 
+			: $theme === 'system'
+				? window.matchMedia('(prefers-color-scheme: dark)').matches
+					? 'dark'
+					: 'light'
+				: 'light')
+		: typeof $theme === 'object' && $theme?.name
+			? ($theme.name.includes('dark')
 				? 'dark'
-				: 'light'
+				: $theme.name === 'system'
+					? window.matchMedia('(prefers-color-scheme: dark)').matches
+						? 'dark'
+						: 'light'
+					: 'light')
 			: 'light'}
 	richColors
 	position="top-right"
