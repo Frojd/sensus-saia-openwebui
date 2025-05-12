@@ -13,8 +13,11 @@ router = APIRouter()
 # Define the theme settings model
 class ThemeSettings(BaseModel):
     primaryColor: str
+    primaryForeground: str = "#FFFFFF"
     secondaryColor: str
+    secondaryForeground: str = "#FFFFFF"
     accentColor: str
+    accentForeground: str = "#FFFFFF"
     logoUrl: str = ""
     faviconUrl: str = ""
 
@@ -29,8 +32,11 @@ if not THEME_SETTINGS_PATH.exists():
     with open(THEME_SETTINGS_PATH, "w") as f:
         json.dump({
             "primaryColor": "#3B82F6",
+            "primaryForeground": "#FFFFFF",
             "secondaryColor": "#10B981",
+            "secondaryForeground": "#FFFFFF",
             "accentColor": "#8B5CF6",
+            "accentForeground": "#FFFFFF",
             "logoUrl": "",
             "faviconUrl": ""
         }, f)
@@ -132,8 +138,11 @@ async def get_theme_css():
         css = f"""
         :root {{
             --primary-color: {theme.get("primaryColor", "#3B82F6")};
+            --primary-foreground: {theme.get("primaryForeground", "#FFFFFF")};
             --secondary-color: {theme.get("secondaryColor", "#10B981")};
+            --secondary-foreground: {theme.get("secondaryForeground", "#FFFFFF")};
             --accent-color: {theme.get("accentColor", "#8B5CF6")};
+            --accent-foreground: {theme.get("accentForeground", "#FFFFFF")};
         }}
         
         /* Buttons */
@@ -143,6 +152,7 @@ async def get_theme_css():
         button[type="submit"],
         .bg-blue-500 {{
             background-color: var(--primary-color) !important;
+            color: var(--primary-foreground) !important;
         }}
         
         /* Text colors */
@@ -173,6 +183,7 @@ async def get_theme_css():
         .bg-green-500,
         .hover\\:bg-green-600:hover {{
             background-color: var(--secondary-color) !important;
+            color: var(--secondary-foreground) !important;
         }}
         
         .text-green-500,
@@ -191,6 +202,7 @@ async def get_theme_css():
         .bg-indigo-500,
         .hover\\:bg-indigo-600:hover {{
             background-color: var(--accent-color) !important;
+            color: var(--accent-foreground) !important;
         }}
         
         .text-purple-500,

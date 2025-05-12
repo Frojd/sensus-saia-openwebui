@@ -9,8 +9,11 @@
 
 	// Theme settings
 	let primaryColor = '#3B82F6'; // Default blue color
+	let primaryForeground = '#FFFFFF'; // Default white text
 	let secondaryColor = '#10B981'; // Default green color
+	let secondaryForeground = '#FFFFFF'; // Default white text
 	let accentColor = '#8B5CF6'; // Default purple color
+	let accentForeground = '#FFFFFF'; // Default white text
 	let logoUrl = '';
 	let faviconUrl = '';
 	let customLogoFile = null;
@@ -26,8 +29,11 @@
 			if (response.ok) {
 				const themeData = await response.json();
 				primaryColor = themeData.primaryColor || primaryColor;
+				primaryForeground = themeData.primaryForeground || primaryForeground;
 				secondaryColor = themeData.secondaryColor || secondaryColor;
+				secondaryForeground = themeData.secondaryForeground || secondaryForeground;
 				accentColor = themeData.accentColor || accentColor;
+				accentForeground = themeData.accentForeground || accentForeground;
 				logoUrl = themeData.logoUrl || logoUrl;
 				faviconUrl = themeData.faviconUrl || faviconUrl;
 			}
@@ -113,8 +119,11 @@
 			// Prepare theme data
 			const themeData = {
 				primaryColor,
+				primaryForeground,
 				secondaryColor,
+				secondaryForeground,
 				accentColor,
+				accentForeground,
 				// Use base64 data if available from file upload, otherwise use the URL
 				logoUrl: customLogoFile?.base64 || logoUrl,
 				faviconUrl: customFaviconFile?.base64 || faviconUrl
@@ -151,8 +160,11 @@
 	function applyThemeToDocument() {
 		// Create or update CSS variables in document root
 		document.documentElement.style.setProperty('--primary-color', primaryColor);
+		document.documentElement.style.setProperty('--primary-foreground', primaryForeground);
 		document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+		document.documentElement.style.setProperty('--secondary-foreground', secondaryForeground);
 		document.documentElement.style.setProperty('--accent-color', accentColor);
+		document.documentElement.style.setProperty('--accent-foreground', accentForeground);
 		
 		// Create or update a stylesheet for the theme
 		let styleElement = document.getElementById('custom-theme-styles');
@@ -166,8 +178,11 @@
 		styleElement.textContent = `
 			:root {
 				--primary-color: ${primaryColor};
+				--primary-foreground: ${primaryForeground};
 				--secondary-color: ${secondaryColor};
+				--secondary-foreground: ${secondaryForeground};
 				--accent-color: ${accentColor};
+				--accent-foreground: ${accentForeground};
 			}
 			
 			/* Buttons */
@@ -177,6 +192,7 @@
 			button[type="submit"],
 			.bg-blue-500 {
 				background-color: var(--primary-color) !important;
+				color: var(--primary-foreground) !important;
 			}
 			
 			/* Text colors */
@@ -207,6 +223,7 @@
 			.bg-green-500,
 			.hover\\:bg-green-600:hover {
 				background-color: var(--secondary-color) !important;
+				color: var(--secondary-foreground) !important;
 			}
 			
 			.text-green-500,
@@ -220,6 +237,7 @@
 			.bg-indigo-500,
 			.hover\\:bg-indigo-600:hover {
 				background-color: var(--accent-color) !important;
+				color: var(--accent-foreground) !important;
 			}
 			
 			.text-purple-500,
@@ -425,6 +443,22 @@
 							class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
 						/>
 					</div>
+					<div class="flex items-center space-x-2 mt-1">
+						<label for="primary-foreground" class="text-xs font-medium text-gray-600 dark:text-gray-400 w-24">
+							{$i18n.t('Text Color')}:
+						</label>
+						<input
+							id="primary-foreground"
+							type="color"
+							bind:value={primaryForeground}
+							class="h-6 w-6 border-0 rounded-md cursor-pointer"
+						/>
+						<input
+							type="text"
+							bind:value={primaryForeground}
+							class="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+						/>
+					</div>
 				</div>
 				
 				<!-- Secondary Color -->
@@ -443,6 +477,22 @@
 							type="text"
 							bind:value={secondaryColor}
 							class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+						/>
+					</div>
+					<div class="flex items-center space-x-2 mt-1">
+						<label for="secondary-foreground" class="text-xs font-medium text-gray-600 dark:text-gray-400 w-24">
+							{$i18n.t('Text Color')}:
+						</label>
+						<input
+							id="secondary-foreground"
+							type="color"
+							bind:value={secondaryForeground}
+							class="h-6 w-6 border-0 rounded-md cursor-pointer"
+						/>
+						<input
+							type="text"
+							bind:value={secondaryForeground}
+							class="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
 						/>
 					</div>
 				</div>
@@ -465,40 +515,27 @@
 							class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
 						/>
 					</div>
+					<div class="flex items-center space-x-2 mt-1">
+						<label for="accent-foreground" class="text-xs font-medium text-gray-600 dark:text-gray-400 w-24">
+							{$i18n.t('Text Color')}:
+						</label>
+						<input
+							id="accent-foreground"
+							type="color"
+							bind:value={accentForeground}
+							class="h-6 w-6 border-0 rounded-md cursor-pointer"
+						/>
+						<input
+							type="text"
+							bind:value={accentForeground}
+							class="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+						/>
+					</div>
 				</div>
 			</div>
 			
 			<!-- Color Preview -->
 			<div class="mt-4 p-4 bg-white dark:bg-gray-700 rounded-md">
-				<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-					{$i18n.t('Preview')}
-				</h4>
-				<div class="flex flex-wrap gap-3">
-					<div class="flex flex-col items-center">
-						<div
-							class="h-12 w-12 rounded-md"
-							style="background-color: {primaryColor};"
-							aria-label="Primary color preview"
-						></div>
-						<span class="text-xs mt-1 text-gray-600 dark:text-gray-400">Primary</span>
-					</div>
-					<div class="flex flex-col items-center">
-						<div
-							class="h-12 w-12 rounded-md"
-							style="background-color: {secondaryColor};"
-							aria-label="Secondary color preview"
-						></div>
-						<span class="text-xs mt-1 text-gray-600 dark:text-gray-400">Secondary</span>
-					</div>
-					<div class="flex flex-col items-center">
-						<div
-							class="h-12 w-12 rounded-md"
-							style="background-color: {accentColor};"
-							aria-label="Accent color preview"
-						></div>
-						<span class="text-xs mt-1 text-gray-600 dark:text-gray-400">Accent</span>
-					</div>
-				</div>
 				
 				<!-- Sample UI Elements -->
 				<div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
@@ -509,20 +546,20 @@
 					<!-- Buttons -->
 					<div class="flex flex-wrap gap-3 mb-3">
 						<button
-							class="px-3 py-1.5 text-sm font-medium rounded-md text-white"
-							style="background-color: {primaryColor};"
+							class="px-3 py-1.5 text-sm font-medium rounded-full"
+							style="background-color: {primaryColor}; color: {primaryForeground};"
 						>
 							{$i18n.t('Primary Button')}
 						</button>
 						<button
-							class="px-3 py-1.5 text-sm font-medium rounded-md text-white"
-							style="background-color: {secondaryColor};"
+							class="px-3 py-1.5 text-sm font-medium rounded-full"
+							style="background-color: {secondaryColor}; color: {secondaryForeground};"
 						>
 							{$i18n.t('Secondary Button')}
 						</button>
 						<button
-							class="px-3 py-1.5 text-sm font-medium rounded-md text-white"
-							style="background-color: {accentColor};"
+							class="px-3 py-1.5 text-sm font-medium rounded-full"
+							style="background-color: {accentColor}; color: {accentForeground};"
 						>
 							{$i18n.t('Accent Button')}
 						</button>
@@ -541,32 +578,6 @@
 						</a>
 					</div>
 					
-					<!-- Form Elements -->
-					<div class="flex flex-wrap gap-3 mb-3">
-						<div class="flex items-center">
-							<input 
-								type="checkbox" 
-								class="rounded" 
-								style="accent-color: {primaryColor};"
-								checked
-							/>
-							<span class="ml-1 text-xs">{$i18n.t('Checkbox')}</span>
-						</div>
-						<div class="flex items-center">
-							<input 
-								type="radio" 
-								class="rounded-full" 
-								style="accent-color: {primaryColor};"
-								checked
-							/>
-							<span class="ml-1 text-xs">{$i18n.t('Radio')}</span>
-						</div>
-						<div class="w-24">
-							<div class="h-1 rounded-full" style="background-color: {primaryColor};">
-							</div>
-							<span class="text-xs">{$i18n.t('Progress')}</span>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -576,7 +587,7 @@
 		<button
 			on:click={saveThemeSettings}
 			disabled={isLoading}
-			class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
+			class="px-3.5 py-1.5 text-sm font-medium  bg-blue-600 hover:bg-blue-700 text-white rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed"
 		>
 			{#if isLoading}
 				<span class="inline-block animate-spin mr-2">⟳</span>
