@@ -12,7 +12,9 @@
 	let secondaryColor = '#10B981'; // Default green color
 	let accentColor = '#8B5CF6'; // Default purple color
 	let logoUrl = '';
+	let faviconUrl = '';
 	let customLogoFile = null;
+	let customFaviconFile = null;
 	let isLoading = false;
 
 	// Load saved settings on mount
@@ -27,6 +29,7 @@
 				secondaryColor = themeData.secondaryColor || secondaryColor;
 				accentColor = themeData.accentColor || accentColor;
 				logoUrl = themeData.logoUrl || logoUrl;
+				faviconUrl = themeData.faviconUrl || faviconUrl;
 			}
 			
 			// Apply theme immediately
@@ -39,8 +42,8 @@
 		}
 	});
 
-	// Handle file upload
-	function handleFileChange(event) {
+	// Handle file upload for logo
+	function handleLogoFileChange(event) {
 		const file = event.target.files[0];
 		if (file) {
 			customLogoFile = file;
@@ -62,12 +65,44 @@
 		}
 	}
 
+	// Handle file upload for favicon
+	function handleFaviconFileChange(event) {
+		const file = event.target.files[0];
+		if (file) {
+			customFaviconFile = file;
+			// Create a preview URL for immediate display
+			faviconUrl = URL.createObjectURL(file);
+			
+			// Convert file to base64 for storage
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				// Store the base64 data in faviconUrl when saving
+				const base64Data = e.target.result;
+				// Keep the blob URL for preview, but we'll use base64 when saving
+				customFaviconFile = {
+					file: file,
+					base64: base64Data
+				};
+			};
+			reader.readAsDataURL(file);
+		}
+	}
+
 	// Reset logo to default
 	function resetLogo() {
 		logoUrl = '';
 		customLogoFile = null;
 		if (document.getElementById('logo-upload')) {
 			document.getElementById('logo-upload').value = '';
+		}
+	}
+
+	// Reset favicon to default
+	function resetFavicon() {
+		faviconUrl = '';
+		customFaviconFile = null;
+		if (document.getElementById('favicon-upload')) {
+			document.getElementById('favicon-upload').value = '';
 		}
 	}
 
@@ -81,7 +116,8 @@
 				secondaryColor,
 				accentColor,
 				// Use base64 data if available from file upload, otherwise use the URL
-				logoUrl: customLogoFile?.base64 || logoUrl
+				logoUrl: customLogoFile?.base64 || logoUrl,
+				faviconUrl: customFaviconFile?.base64 || faviconUrl
 			};
 			
 			// Save to server using our new API endpoint
@@ -203,6 +239,23 @@
 				}
 			});
 		}
+		
+		// Update favicon if provided
+		if (faviconUrl) {
+			// Look for existing favicon link
+			let faviconLink = document.querySelector('link[rel="icon"]') || 
+							  document.querySelector('link[rel="shortcut icon"]');
+			
+			// If no favicon link exists, create one
+			if (!faviconLink) {
+				faviconLink = document.createElement('link');
+				faviconLink.rel = 'icon';
+				document.head.appendChild(faviconLink);
+			}
+			
+			// Update the favicon href
+			faviconLink.href = faviconUrl;
+		}
 	}
 </script>
 
@@ -221,61 +274,128 @@
 	{:else}
 
 	<div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-6">
-		<!-- Logo Section -->
-		<div class="space-y-3">
-			<h3 class="text-lg font-medium">{$i18n.t('Custom Logo')}</h3>
-			<p class="text-sm text-gray-600 dark:text-gray-300">
-				{$i18n.t('Upload a custom logo for your instance')}
-			</p>
-			
-			<div class="flex flex-col space-y-4">
-				<!-- Logo Upload -->
-				<div class="flex flex-col space-y-2">
-					<label for="logo-upload" class="text-sm font-medium text-gray-700 dark:text-gray-300">
-						{$i18n.t('Upload Logo')}
-					</label>
-					<input
-						id="logo-upload"
-						type="file"
-						accept="image/*"
-						on:change={handleFileChange}
-						class="block w-full text-sm text-gray-500 dark:text-gray-300
-							file:mr-4 file:py-2 file:px-4
-							file:rounded-md file:border-0
-							file:text-sm file:font-semibold
-							file:bg-blue-50 file:text-blue-700
-							dark:file:bg-blue-900 dark:file:text-blue-200
-							hover:file:bg-blue-100 dark:hover:file:bg-blue-800
-							transition"
-					/>
-				</div>
+		<!-- Branding Section -->
+		<div class="space-y-6">
+			<!-- Logo Section -->
+			<div class="space-y-3">
+				<h3 class="text-lg font-medium">{$i18n.t('Custom Logo')}</h3>
+				<p class="text-sm text-gray-600 dark:text-gray-300">
+					{$i18n.t('Upload a custom logo for your instance')}
+				</p>
 				
-				<!-- Logo URL -->
-				<div class="flex flex-col space-y-2">
-					<label for="logo-url" class="text-sm font-medium text-gray-700 dark:text-gray-300">
-						{$i18n.t('Or enter logo URL')}
-					</label>
-					<input
-						id="logo-url"
-						type="text"
-						bind:value={logoUrl}
-						placeholder="https://example.com/logo.png"
-						class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-					/>
-				</div>
-				
-				<!-- Logo Preview -->
-				{#if logoUrl}
-					<div class="mt-2 p-4 bg-white dark:bg-gray-700 rounded-md flex flex-col items-center justify-center space-y-3">
-						<img src={logoUrl} alt="Logo Preview" class="max-h-16 max-w-full" />
-						<button 
-							on:click={resetLogo}
-							class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
-						>
-							{$i18n.t('Reset to default')}
-						</button>
+				<div class="flex flex-col space-y-4">
+					<!-- Logo Upload -->
+					<div class="flex flex-col space-y-2">
+						<label for="logo-upload" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+							{$i18n.t('Upload Logo')}
+						</label>
+						<input
+							id="logo-upload"
+							type="file"
+							accept="image/*"
+							on:change={handleLogoFileChange}
+							class="block w-full text-sm text-gray-500 dark:text-gray-300
+								file:mr-4 file:py-2 file:px-4
+								file:rounded-md file:border-0
+								file:text-sm file:font-semibold
+								file:bg-blue-50 file:text-blue-700
+								dark:file:bg-blue-900 dark:file:text-blue-200
+								hover:file:bg-blue-100 dark:hover:file:bg-blue-800
+								transition"
+						/>
 					</div>
-				{/if}
+					
+					<!-- Logo URL -->
+					<div class="flex flex-col space-y-2">
+						<label for="logo-url" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+							{$i18n.t('Or enter logo URL')}
+						</label>
+						<input
+							id="logo-url"
+							type="text"
+							bind:value={logoUrl}
+							placeholder="https://example.com/logo.png"
+							class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+						/>
+					</div>
+					
+					<!-- Logo Preview -->
+					{#if logoUrl}
+						<div class="mt-2 p-4 bg-white dark:bg-gray-700 rounded-md flex flex-col items-center justify-center space-y-3">
+							<img src={logoUrl} alt="Logo Preview" class="max-h-16 max-w-full" />
+							<button 
+								on:click={resetLogo}
+								class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+							>
+								{$i18n.t('Reset to default')}
+							</button>
+						</div>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Favicon Section -->
+			<div class="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+				<h3 class="text-lg font-medium">{$i18n.t('Custom Favicon')}</h3>
+				<p class="text-sm text-gray-600 dark:text-gray-300">
+					{$i18n.t('Upload a custom favicon for your instance')}
+				</p>
+				
+				<div class="flex flex-col space-y-4">
+					<!-- Favicon Upload -->
+					<div class="flex flex-col space-y-2">
+						<label for="favicon-upload" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+							{$i18n.t('Upload Favicon')}
+						</label>
+						<input
+							id="favicon-upload"
+							type="file"
+							accept="image/*"
+							on:change={handleFaviconFileChange}
+							class="block w-full text-sm text-gray-500 dark:text-gray-300
+								file:mr-4 file:py-2 file:px-4
+								file:rounded-md file:border-0
+								file:text-sm file:font-semibold
+								file:bg-blue-50 file:text-blue-700
+								dark:file:bg-blue-900 dark:file:text-blue-200
+								hover:file:bg-blue-100 dark:hover:file:bg-blue-800
+								transition"
+						/>
+						<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+							{$i18n.t('Recommended: square image in .ico, .png, or .svg format')}
+						</p>
+					</div>
+					
+					<!-- Favicon URL -->
+					<div class="flex flex-col space-y-2">
+						<label for="favicon-url" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+							{$i18n.t('Or enter favicon URL')}
+						</label>
+						<input
+							id="favicon-url"
+							type="text"
+							bind:value={faviconUrl}
+							placeholder="https://example.com/favicon.ico"
+							class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+						/>
+					</div>
+					
+					<!-- Favicon Preview -->
+					{#if faviconUrl}
+						<div class="mt-2 p-4 bg-white dark:bg-gray-700 rounded-md flex flex-col items-center justify-center space-y-3">
+							<div class="flex items-center justify-center bg-gray-100 dark:bg-gray-800 p-2 rounded-md">
+								<img src={faviconUrl} alt="Favicon Preview" class="h-8 w-8" />
+								<span class="ml-2 text-sm text-gray-600 dark:text-gray-300">Tab icon preview</span>
+							</div>
+							<button 
+								on:click={resetFavicon}
+								class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+							>
+								{$i18n.t('Reset to default')}
+							</button>
+						</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 		

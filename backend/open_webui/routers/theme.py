@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import json
 import os
+import re
 from pathlib import Path
 
 from open_webui.utils.auth import get_admin_user
@@ -14,6 +16,7 @@ class ThemeSettings(BaseModel):
     secondaryColor: str
     accentColor: str
     logoUrl: str = ""
+    faviconUrl: str = ""
 
 # Path to store theme settings
 THEME_SETTINGS_PATH = Path("data/theme_settings.json")
@@ -28,7 +31,8 @@ if not THEME_SETTINGS_PATH.exists():
             "primaryColor": "#3B82F6",
             "secondaryColor": "#10B981",
             "accentColor": "#8B5CF6",
-            "logoUrl": ""
+            "logoUrl": "",
+            "faviconUrl": ""
         }, f)
 
 @router.get("/theme")
@@ -52,41 +56,66 @@ async def save_theme_settings(
         with open(THEME_SETTINGS_PATH, "w") as f:
             json.dump(theme_settings.dict(), f)
         
-        # If there's a base64 logo, also save it as a file
-        if theme_settings.logoUrl and theme_settings.logoUrl.startswith('data:image'):
-            try:
-                # Extract the base64 data and file type
-                import base64
-                import re
-                
+        # Import required modules for image processing
+        import base64
+        import re
+        
+        # Create a directory for theme assets if it doesn't exist
+        theme_dir = Path("data/theme")
+        theme_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Function to save base64 image
+        def save_base64_image(base64_url, file_prefix):
+            if base64_url and base64_url.startswith('data:image'):
                 # Parse the base64 string
-                data_match = re.match(r'data:image/([a-zA-Z0-9]+);base64,(.+)', theme_settings.logoUrl)
+                data_match = re.match(r'data:image/([a-zA-Z0-9]+);base64,(.+)', base64_url)
                 if data_match:
                     file_type, base64_data = data_match.groups()
                     
-                    # Create a directory for the logo if it doesn't exist
-                    logo_dir = Path("data/theme")
-                    logo_dir.mkdir(parents=True, exist_ok=True)
+                    # Save the image to a file
+                    file_path = theme_dir / f"{file_prefix}.{file_type}"
+                    with open(file_path, "wb") as image_file:
+                        image_file.write(base64.b64decode(base64_data))
                     
-                    # Save the logo to a file
-                    logo_path = logo_dir / f"logo.{file_type}"
-                    with open(logo_path, "wb") as logo_file:
-                        logo_file.write(base64.b64decode(base64_data))
-                    
-                    # Update the theme settings to use the file path instead of base64
-                    file_url = f"/api/theme/logo"
-                    
-                    # Update the JSON file with the file URL
-                    with open(THEME_SETTINGS_PATH, "r") as f:
-                        theme_data = json.load(f)
-                    
-                    theme_data["logoUrl"] = file_url
-                    
-                    with open(THEME_SETTINGS_PATH, "w") as f:
-                        json.dump(theme_data, f)
+                    # Return the API URL for the saved image
+                    return f"/api/theme/{file_prefix}"
+            return base64_url
+        
+        # Process logo if provided
+        if theme_settings.logoUrl and theme_settings.logoUrl.startswith('data:image'):
+            try:
+                # Save logo and update URL
+                file_url = save_base64_image(theme_settings.logoUrl, "logo")
+                
+                # Update the JSON file with the file URL
+                with open(THEME_SETTINGS_PATH, "r") as f:
+                    theme_data = json.load(f)
+                
+                theme_data["logoUrl"] = file_url
+                
+                with open(THEME_SETTINGS_PATH, "w") as f:
+                    json.dump(theme_data, f)
             except Exception as logo_error:
                 print(f"Error saving logo file: {str(logo_error)}")
                 # Continue even if logo saving fails
+        
+        # Process favicon if provided
+        if theme_settings.faviconUrl and theme_settings.faviconUrl.startswith('data:image'):
+            try:
+                # Save favicon and update URL
+                file_url = save_base64_image(theme_settings.faviconUrl, "favicon")
+                
+                # Update the JSON file with the file URL
+                with open(THEME_SETTINGS_PATH, "r") as f:
+                    theme_data = json.load(f)
+                
+                theme_data["faviconUrl"] = file_url
+                
+                with open(THEME_SETTINGS_PATH, "w") as f:
+                    json.dump(theme_data, f)
+            except Exception as favicon_error:
+                print(f"Error saving favicon file: {str(favicon_error)}")
+                # Continue even if favicon saving fails
         
         return {"status": "success"}
     except Exception as e:
@@ -240,16 +269,15 @@ async def get_theme_css():
         # Return empty CSS on error
         return Response(content="", media_type="text/css")
 
-# Serve the logo file
-@router.get("/theme/logo")
-async def get_theme_logo():
-    """Get the theme logo"""
+# Helper function to serve theme images
+async def serve_theme_image(image_prefix):
+    """Serve a theme image (logo or favicon)"""
     try:
-        # Check for logo files in different formats
-        logo_dir = Path("data/theme")
-        for ext in ["png", "jpg", "jpeg", "svg", "gif", "webp"]:
-            logo_path = logo_dir / f"logo.{ext}"
-            if logo_path.exists():
+        # Check for image files in different formats
+        theme_dir = Path("data/theme")
+        for ext in ["png", "jpg", "jpeg", "svg", "gif", "webp", "ico"]:
+            image_path = theme_dir / f"{image_prefix}.{ext}"
+            if image_path.exists():
                 # Determine the correct media type
                 media_types = {
                     "png": "image/png",
@@ -257,20 +285,54 @@ async def get_theme_logo():
                     "jpeg": "image/jpeg",
                     "svg": "image/svg+xml",
                     "gif": "image/gif",
-                    "webp": "image/webp"
+                    "webp": "image/webp",
+                    "ico": "image/x-icon"
                 }
                 
-                with open(logo_path, "rb") as f:
-                    logo_data = f.read()
+                with open(image_path, "rb") as f:
+                    image_data = f.read()
                 
                 return Response(
-                    content=logo_data, 
+                    content=image_data, 
                     media_type=media_types.get(ext, "application/octet-stream")
                 )
         
-        # If no logo file is found, return a 404
-        raise HTTPException(status_code=404, detail="Logo not found")
+        # If no image file is found, return a 404
+        raise HTTPException(status_code=404, detail=f"{image_prefix.capitalize()} not found")
     except Exception as e:
         if isinstance(e, HTTPException):
             raise e
-        raise HTTPException(status_code=500, detail=f"Error serving logo: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error serving {image_prefix}: {str(e)}")
+
+# Serve the logo file
+@router.get("/theme/logo")
+async def get_theme_logo():
+    """Get the theme logo"""
+    return await serve_theme_image("logo")
+
+# Serve the favicon file
+@router.get("/theme/favicon")
+async def get_theme_favicon():
+    """Get the theme favicon"""
+    return await serve_theme_image("favicon")
+
+# Get the current favicon URL
+@router.get("/theme/favicon-url")
+async def get_favicon_url():
+    """Get the current favicon URL"""
+    try:
+        if THEME_SETTINGS_PATH.exists():
+            with open(THEME_SETTINGS_PATH, "r") as f:
+                theme_settings = json.load(f)
+                favicon_url = theme_settings.get("faviconUrl", "")
+                if favicon_url:
+                    return {"url": favicon_url}
+        return {"url": "/static/favicon.png"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting favicon URL: {str(e)}")
+
+
+# Initialize theme module
+def init_theme(app):
+    """Initialize the theme module"""
+    return router
