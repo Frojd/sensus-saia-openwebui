@@ -387,7 +387,7 @@
 		<div>
 			<h1 class=" mb-1.5 text-sm font-medium">{$i18n.t('UI')}</h1>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="high-contrast-mode-label" class=" self-center text-xs">
 						{$i18n.t('High Contrast Mode')} ({$i18n.t('Beta')})
@@ -504,7 +504,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="chat-direction-label" class=" self-center text-xs">
 						{$i18n.t('Chat direction')}
@@ -527,9 +527,15 @@
 				</div>
 			</div>
 
+<<<<<<< HEAD
 			<div>
 				<div class="py-0.5 flex w-full justify-between">
 					<div id="notification-sound-label" class=" self-center text-xs">
+=======
+			<div data-admin-element="true">
+				<div class=" py-0.5 flex w-full justify-between">
+					<div class=" self-center text-xs">
+>>>>>>> 31e580d77 (Hide admin elements based on user role)
 						{$i18n.t('Notification Sound')}
 					</div>
 
@@ -551,7 +557,7 @@
 			</div>
 
 			{#if notificationSound}
-				<div>
+				<div data-admin-element="true">
 					<div class=" py-0.5 flex w-full justify-between">
 						<div id="play-notification-sound-label" class=" self-center text-xs">
 							{$i18n.t('Always Play Notification Sound')}
@@ -576,7 +582,7 @@
 			{/if}
 
 			{#if $user?.role === 'admin'}
-				<div>
+				<div data-admin-element="true">
 					<div class=" py-0.5 flex w-full justify-between">
 						<div id="toast-notifications-label" class=" self-center text-xs">
 							{$i18n.t('Toast notifications for new updates')}
@@ -599,7 +605,7 @@
 					</div>
 				</div>
 
-				<div>
+				<div data-admin-element="true">
 					<div class=" py-0.5 flex w-full justify-between">
 						<div id="whats-new-label" class=" self-center text-xs">
 							{$i18n.t(`Show "What's New" modal on login`)}
@@ -692,7 +698,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="detect-artifacts-label" class=" self-center text-xs">
 						{$i18n.t('Detect Artifacts Automatically')}
@@ -715,7 +721,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="auto-copy-label" class=" self-center text-xs">
 						{$i18n.t('Auto-Copy Response to Clipboard')}
@@ -738,7 +744,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="rich-input-label" class=" self-center text-xs">
 						{$i18n.t('Rich Text Input for Chat')}
@@ -832,7 +838,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="always-collapse-label" class=" self-center text-xs">
 						{$i18n.t('Always Collapse Code Blocks')}
@@ -855,7 +861,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="always-expand-label" class=" self-center text-xs">
 						{$i18n.t('Always Expand Details')}
@@ -927,7 +933,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="haptic-feedback-label" class=" self-center text-xs">
 						{$i18n.t('Haptic Feedback')} ({$i18n.t('Android')})
@@ -996,7 +1002,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="scroll-on-branch-change-label" class=" self-center text-xs">
 						{$i18n.t('Scroll On Branch Change')}
@@ -1019,7 +1025,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="web-search-in-chat-label" class=" self-center text-xs">
 						{$i18n.t('Web Search in Chat')}
@@ -1042,7 +1048,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="iframe-sandbox-allow-same-origin-label" class=" self-center text-xs">
 						{$i18n.t('iframe Sandbox Allow Same Origin')}
@@ -1065,7 +1071,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="iframe-sandbox-allow-forms-label" class=" self-center text-xs">
 						{$i18n.t('iframe Sandbox Allow Forms')}
@@ -1088,6 +1094,7 @@
 				</div>
 			</div>
 
+<<<<<<< HEAD
 			<div>
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="stylized-pdf-export-label" class=" self-center text-xs">
@@ -1112,8 +1119,11 @@
 			</div>
 
 			<div class=" my-1.5 text-sm font-medium">{$i18n.t('Voice')}</div>
+=======
+			<div class=" my-1.5 text-sm font-medium" data-admin-element="true">{$i18n.t('Voice')}</div>
+>>>>>>> 31e580d77 (Hide admin elements based on user role)
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div class=" self-center text-xs">{$i18n.t('Allow Voice Interruption in Call')}</div>
 
@@ -1134,7 +1144,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="display-emoji-label" class=" self-center text-xs">
 						{$i18n.t('Display Emoji in Call')}
@@ -1157,9 +1167,9 @@
 				</div>
 			</div>
 
-			<div class=" my-1.5 text-sm font-medium">{$i18n.t('File')}</div>
+			<div class=" my-1.5 text-sm font-medium" data-admin-element="true">{$i18n.t('File')}</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="image-compression-label" class=" self-center text-xs">
 						{$i18n.t('Image Compression')}

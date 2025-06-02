@@ -247,7 +247,7 @@
 			</div>
 
 			{#if $config?.features?.enable_user_webhooks}
-				<div class="pt-2">
+				<div class="pt-2" data-admin-element="true">
 					<div class="flex flex-col w-full">
 						<div class=" mb-1 text-xs font-medium">{$i18n.t('Notification Webhook')}</div>
 
@@ -272,7 +272,7 @@
 		</div>
 
 		{#if ($config?.features?.enable_api_key ?? true) || $user?.role === 'admin'}
-			<div class="flex justify-between items-center text-sm mb-2">
+			<div class="flex justify-between items-center text-sm mb-2" data-admin-element="true">
 				<div class="  font-medium">{$i18n.t('API keys')}</div>
 				<button
 					class=" text-xs font-medium text-gray-500"

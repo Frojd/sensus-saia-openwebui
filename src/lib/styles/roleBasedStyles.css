@@ -1,0 +1,4 @@
+/* Hide admin elements for non-admin users */
+body:not(.role-admin) [data-admin-element="true"] {
+  display: none !important;
+}
