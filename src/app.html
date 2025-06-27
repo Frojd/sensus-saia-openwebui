@@ -34,6 +34,43 @@
 		</script>
 
 		<script>
+			// Load and apply theme settings
+			async function loadThemeSettings() {
+				try {
+					const response = await fetch('/api/theme');
+					if (response.ok) {
+						const theme = await response.json();
+						
+						// Apply splash screen customizations
+						if (theme.splashBackgroundColor) {
+							const splashScreen = document.getElementById('splash-screen');
+							if (splashScreen) {
+								splashScreen.style.backgroundColor = theme.splashBackgroundColor;
+							}
+						}
+						
+						if (theme.splashImageUrl) {
+							const logoElements = document.querySelectorAll('#logo, #logo-her');
+							logoElements.forEach(element => {
+								if (element instanceof HTMLImageElement) {
+									element.src = theme.splashImageUrl;
+								}
+							});
+						}
+						
+						// Apply favicon
+						if (theme.faviconUrl) {
+							const faviconLinks = document.querySelectorAll('link[rel*="icon"]');
+							faviconLinks.forEach(link => {
+								link.href = theme.faviconUrl;
+							});
+						}
+					}
+				} catch (error) {
+					console.log('Could not load theme settings:', error);
+				}
+			}
+
 			// On page load or when changing themes, best to add inline in `head` to avoid FOUC
 			(() => {
 				const metaThemeColorTag = document.querySelector('meta[name="theme-color"]');
@@ -99,7 +136,10 @@
 				}
 
 				// Runs after classes are assigned
-				window.onload = setSplashImage;
+				window.onload = () => {
+					setSplashImage();
+					loadThemeSettings();
+				};
 			})();
 		</script>
 

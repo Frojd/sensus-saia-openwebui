@@ -20,6 +20,8 @@ class ThemeSettings(BaseModel):
     accentForeground: str = "#FFFFFF"
     logoUrl: str = ""
     faviconUrl: str = ""
+    splashImageUrl: str = ""
+    splashBackgroundColor: str = ""
 
 # Path to store theme settings
 THEME_SETTINGS_PATH = Path("data/theme_settings.json")
@@ -38,7 +40,9 @@ if not THEME_SETTINGS_PATH.exists():
             "accentColor": "#8B5CF6",
             "accentForeground": "#FFFFFF",
             "logoUrl": "",
-            "faviconUrl": ""
+            "faviconUrl": "",
+            "splashImageUrl": "",
+            "splashBackgroundColor": ""
         }, f)
 
 @router.get("/theme")
@@ -122,6 +126,24 @@ async def save_theme_settings(
             except Exception as favicon_error:
                 print(f"Error saving favicon file: {str(favicon_error)}")
                 # Continue even if favicon saving fails
+        
+        # Process splash image if provided
+        if theme_settings.splashImageUrl and theme_settings.splashImageUrl.startswith('data:image'):
+            try:
+                # Save splash image and update URL
+                file_url = save_base64_image(theme_settings.splashImageUrl, "splash")
+                
+                # Update the JSON file with the file URL
+                with open(THEME_SETTINGS_PATH, "r") as f:
+                    theme_data = json.load(f)
+                
+                theme_data["splashImageUrl"] = file_url
+                
+                with open(THEME_SETTINGS_PATH, "w") as f:
+                    json.dump(theme_data, f)
+            except Exception as splash_error:
+                print(f"Error saving splash image file: {str(splash_error)}")
+                # Continue even if splash image saving fails
         
         return {"status": "success"}
     except Exception as e:
@@ -274,6 +296,15 @@ async def get_theme_css():
             background-origin: content-box;
             padding: 10px;
         }}
+        
+        /* Splash screen customization */
+        #splash-screen {{
+            {f'background-color: {theme.get("splashBackgroundColor")} !important;' if theme.get("splashBackgroundColor") else ''}
+        }}
+        
+        #logo, #logo-her {{
+            {f'content: url("{theme.get("splashImageUrl")}") !important;' if theme.get("splashImageUrl") else ''}
+        }}
         """
         
         return Response(content=css, media_type="text/css")
@@ -327,6 +358,12 @@ async def get_theme_logo():
 async def get_theme_favicon():
     """Get the theme favicon"""
     return await serve_theme_image("favicon")
+
+# Serve the splash image file
+@router.get("/theme/splash")
+async def get_theme_splash():
+    """Get the theme splash image"""
+    return await serve_theme_image("splash")
 
 # Get the current favicon URL
 @router.get("/theme/favicon-url")

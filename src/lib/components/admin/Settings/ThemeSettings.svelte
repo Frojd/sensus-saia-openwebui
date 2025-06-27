@@ -16,8 +16,11 @@
 	let accentForeground = '#FFFFFF'; // Default white text
 	let logoUrl = '';
 	let faviconUrl = '';
+	let splashImageUrl = '';
+	let splashBackgroundColor = '';
 	let customLogoFile = null;
 	let customFaviconFile = null;
+	let customSplashImageFile = null;
 	let isLoading = false;
 
 	// Load saved settings on mount
@@ -36,6 +39,8 @@
 				accentForeground = themeData.accentForeground || accentForeground;
 				logoUrl = themeData.logoUrl || logoUrl;
 				faviconUrl = themeData.faviconUrl || faviconUrl;
+				splashImageUrl = themeData.splashImageUrl || splashImageUrl;
+				splashBackgroundColor = themeData.splashBackgroundColor || splashBackgroundColor;
 			}
 			
 			// Apply theme immediately
@@ -94,6 +99,29 @@
 		}
 	}
 
+	// Handle file upload for splash image
+	function handleSplashImageFileChange(event) {
+		const file = event.target.files[0];
+		if (file) {
+			customSplashImageFile = file;
+			// Create a preview URL for immediate display
+			splashImageUrl = URL.createObjectURL(file);
+			
+			// Convert file to base64 for storage
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				// Store the base64 data in splashImageUrl when saving
+				const base64Data = e.target.result;
+				// Keep the blob URL for preview, but we'll use base64 when saving
+				customSplashImageFile = {
+					file: file,
+					base64: base64Data
+				};
+			};
+			reader.readAsDataURL(file);
+		}
+	}
+
 	// Reset logo to default
 	function resetLogo() {
 		logoUrl = '';
@@ -112,6 +140,20 @@
 		}
 	}
 
+	// Reset splash image to default
+	function resetSplashImage() {
+		splashImageUrl = '';
+		customSplashImageFile = null;
+		if (document.getElementById('splash-image-upload')) {
+			document.getElementById('splash-image-upload').value = '';
+		}
+	}
+
+	// Reset splash background to default
+	function resetSplashBackground() {
+		splashBackgroundColor = '';
+	}
+
 	// Save theme settings
 	async function saveThemeSettings() {
 		isLoading = true;
@@ -126,7 +168,9 @@
 				accentForeground,
 				// Use base64 data if available from file upload, otherwise use the URL
 				logoUrl: customLogoFile?.base64 || logoUrl,
-				faviconUrl: customFaviconFile?.base64 || faviconUrl
+				faviconUrl: customFaviconFile?.base64 || faviconUrl,
+				splashImageUrl: customSplashImageFile?.base64 || splashImageUrl,
+				splashBackgroundColor
 			};
 			
 			// Save to server using our new API endpoint
@@ -411,6 +455,98 @@
 							>
 								{$i18n.t('Reset to default')}
 							</button>
+						</div>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Splash Screen Section -->
+			<div class="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+				<h3 class="text-lg font-medium">{$i18n.t('Splash Screen')}</h3>
+				<p class="text-sm text-gray-600 dark:text-gray-300">
+					{$i18n.t('Customize the loading screen appearance')}
+				</p>
+				
+				<div class="flex flex-col space-y-4">
+					<!-- Splash Image Upload -->
+					<div class="flex flex-col space-y-2">
+						<label for="splash-image-upload" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+							{$i18n.t('Upload Splash Image')}
+						</label>
+						<input
+							id="splash-image-upload"
+							type="file"
+							accept="image/*"
+							on:change={handleSplashImageFileChange}
+							class="block w-full text-sm text-gray-500 dark:text-gray-300
+								file:mr-4 file:py-2 file:px-4
+								file:rounded-md file:border-0
+								file:text-sm file:font-semibold
+								file:bg-blue-50 file:text-blue-700
+								dark:file:bg-blue-900 dark:file:text-blue-200
+								hover:file:bg-blue-100 dark:hover:file:bg-blue-800
+								transition"
+						/>
+					</div>
+					
+					<!-- Splash Image URL -->
+					<div class="flex flex-col space-y-2">
+						<label for="splash-image-url" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+							{$i18n.t('Or enter splash image URL')}
+						</label>
+						<input
+							id="splash-image-url"
+							type="text"
+							bind:value={splashImageUrl}
+							placeholder="https://example.com/splash.png"
+							class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+						/>
+					</div>
+					
+					<!-- Splash Background Color -->
+					<div class="flex flex-col space-y-2">
+						<label for="splash-background-color" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+							{$i18n.t('Splash Background Color')}
+						</label>
+						<div class="flex items-center space-x-2">
+							<input
+								id="splash-background-color"
+								type="color"
+								bind:value={splashBackgroundColor}
+								class="h-10 w-10 border-0 rounded-md cursor-pointer"
+							/>
+							<input
+								type="text"
+								bind:value={splashBackgroundColor}
+								placeholder="#000000"
+								class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+							/>
+							<button 
+								on:click={resetSplashBackground}
+								class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+							>
+								{$i18n.t('Reset')}
+							</button>
+						</div>
+					</div>
+					
+					<!-- Splash Preview -->
+					{#if splashImageUrl || splashBackgroundColor}
+						<div class="mt-2 p-4 rounded-md flex flex-col items-center justify-center space-y-3"
+							 style="background-color: {splashBackgroundColor || '#ffffff'}; min-height: 120px;">
+							{#if splashImageUrl}
+								<img src={splashImageUrl} alt="Splash Preview" class="max-h-16 max-w-full" />
+							{/if}
+							<div class="flex space-x-2">
+								{#if splashImageUrl}
+									<button 
+										on:click={resetSplashImage}
+										class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+									>
+										{$i18n.t('Reset image')}
+									</button>
+								{/if}
+							</div>
 						</div>
 					{/if}
 				</div>
