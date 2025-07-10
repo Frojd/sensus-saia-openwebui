@@ -37,6 +37,9 @@
 	import '../tailwind.css';
 	import '../app.css';
 
+    import '$lib/styles/roleBasedStyles.css';
+	import { applyUserRoleClass } from '$lib/utils/applyUserRoleClass';
+
 	import 'tippy.js/dist/tippy.css';
 
 	import { WEBUI_BASE_URL, WEBUI_HOSTNAME } from '$lib/constants';
@@ -465,6 +468,11 @@
 		if (typeof window !== 'undefined' && window.applyTheme) {
 			window.applyTheme();
 		}
+
+		// Add user role to body class when user changes
+		user.subscribe((value) => {
+			applyUserRoleClass(value?.role);
+		});
 
 		if (window?.electronAPI) {
 			const info = await window.electronAPI.send({

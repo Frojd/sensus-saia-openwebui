@@ -282,7 +282,7 @@
 		{/if}
 
 		{#if $user?.role === 'admin' || ($user?.permissions.chat?.controls ?? true)}
-			<div class="mt-2 space-y-3 pr-1.5">
+			<div class="mt-2 space-y-3 pr-1.5" data-admin-element="true">
 				<div class="flex justify-between items-center text-sm">
 					<div class="  font-medium">{$i18n.t('Advanced Parameters')}</div>
 					<button

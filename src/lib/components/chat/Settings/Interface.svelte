@@ -387,7 +387,7 @@
 		<div>
 			<h1 class=" mb-1.5 text-sm font-medium">{$i18n.t('UI')}</h1>
 
-			<div data-admin-element="true">
+			<div>
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="high-contrast-mode-label" class=" self-center text-xs">
 						{$i18n.t('High Contrast Mode')} ({$i18n.t('Beta')})
@@ -410,7 +410,7 @@
 				</div>
 			</div>
 
-			<div>
+			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="landing-page-mode-label" class=" self-center text-xs">
 						{$i18n.t('Landing Page Mode')}
@@ -527,15 +527,9 @@
 				</div>
 			</div>
 
-<<<<<<< HEAD
-			<div>
+			<div data-admin-element="true">
 				<div class="py-0.5 flex w-full justify-between">
 					<div id="notification-sound-label" class=" self-center text-xs">
-=======
-			<div data-admin-element="true">
-				<div class=" py-0.5 flex w-full justify-between">
-					<div class=" self-center text-xs">
->>>>>>> 31e580d77 (Hide admin elements based on user role)
 						{$i18n.t('Notification Sound')}
 					</div>
 
@@ -1094,7 +1088,6 @@
 				</div>
 			</div>
 
-<<<<<<< HEAD
 			<div>
 				<div class=" py-0.5 flex w-full justify-between">
 					<div id="stylized-pdf-export-label" class=" self-center text-xs">
@@ -1118,10 +1111,7 @@
 				</div>
 			</div>
 
-			<div class=" my-1.5 text-sm font-medium">{$i18n.t('Voice')}</div>
-=======
 			<div class=" my-1.5 text-sm font-medium" data-admin-element="true">{$i18n.t('Voice')}</div>
->>>>>>> 31e580d77 (Hide admin elements based on user role)
 
 			<div data-admin-element="true">
 				<div class=" py-0.5 flex w-full justify-between">
